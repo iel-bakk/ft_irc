@@ -41,4 +41,5 @@ class Server
         void read_write_socket(int sockfd, int *num_fds);
         void send_socket(void);
         void close_socket(void);
+        int HandleError(int error_replies, int sockfd);
 };

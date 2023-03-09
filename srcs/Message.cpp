@@ -5,7 +5,7 @@ Message:: Message()
 
 }
 
-Message:: Message(std:: string message): message(message)
+Message:: Message(std:: string message, bool found): message(message), found(found)
 {
 }
 
@@ -18,14 +18,29 @@ std:: string Message:: get_message(void)
     return (this-> message);
 }
 
+bool Message:: get_found(void)
+{
+    return (this->found);
+}
+
+std:: string Message:: get_command(void)
+{
+    return (this->command);
+}
+
 void Message:: set_message(std:: string message)
 {
     this->message = message;
 }
 
-void Message:: parse_message(int *num_fd, std:: string message, std:: string password)
+size_t Message:: get_size_vector(void)
 {
-    
+    return (this->params.size());
+}
+
+void Message:: parse_message(std:: string password, std:: string message)
+{
+    this->found = true;
     this->message = message;
     if (this->message[0] == ':')
     {
@@ -46,19 +61,17 @@ void Message:: parse_message(int *num_fd, std:: string message, std:: string pas
     }
     this->command = this->message.substr(0, command_end);
     this->message = this->message.substr(command_end + 1);
-    if (*num_fd == 2)
+    if (this->params.size() == 0)
     {
         if (this->command != "PASS")
         {
             std:: cout << "Invalid Command" << std:: endl;
+            return ;
         }
-        else
+        if (this->message.find(password))
         {
-            if (this->command != password)
-            {
-                std:: cout << "Error : not same password" << std:: endl;
-                return ;
-            }
+            this->found = false;
+            return ;
         }
     }
     while (!this->message.empty())
@@ -83,4 +96,13 @@ void Message:: parse_message(int *num_fd, std:: string message, std:: string pas
             }
         }
     }
+    check_command(this->command);
+}
+
+void Message:: check_command(std:: string command)
+{
+    if (command == "NICK")
+        client.set_nick(this->message);
+    if (command == "USER")
+        client.set_nick(this->message);
 }

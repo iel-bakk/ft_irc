@@ -99,7 +99,7 @@ void Server:: accept_socket(void)
             {
                 if (this->fds[i].fd == this->sockfd)
                 {
-                    this->new_socket_fd = accept(this->sockfd, (struct sockaddr *) &this->socker_addr, (socklen_t *)&size);
+                    this->new_socket_fd = accept(this->sockfd, (struct sockaddr *)&this->socker_addr, (socklen_t *)&size);
                     if (this->new_socket_fd < 0)
                     {
                         std:: cout << "Failed to accept incoming connection\n" << std:: endl;
@@ -122,7 +122,6 @@ void Server:: accept_socket(void)
                     read_write_socket(sock, &num_fds);
                 }
             }
-           
         }
     }
 }
@@ -144,8 +143,9 @@ void Server:: read_write_socket(int sockfd, int *num_fds)
         (*num_fds)--;
         return ;
     }
-    my_message.parse_message(num_fds, buffer, this->password);
-    n = write(sockfd, "I got your message\n", 20);
+    my_message.parse_message(this->password, buffer);
+    if (!my_message.get_found())
+        n = HandleError(464, sockfd);
     if (n < 0)
     {
         std:: cout << "Error: Writing From Socket" << std:: endl;
@@ -159,6 +159,22 @@ void Server:: send_socket(void)
     {
         std:: cout << "Error: Message don't send" << std:: endl;
     }
+}
+
+int Server:: HandleError(int error_replies, int sockfd)
+{
+    int num = 0;
+
+    switch (error_replies)
+    {
+        case 464:
+            num = write(sockfd, "464 ERR_PASSWDMISMATCH:Password incorrect\r\n", 43);
+            break;
+
+        default:
+            break;
+    }
+    return (num);
 }
 
 void Server:: close_socket(void)
