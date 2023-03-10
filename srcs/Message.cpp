@@ -5,7 +5,7 @@ Message:: Message()
 
 }
 
-Message:: Message(std:: string message, bool found): message(message), found(found)
+Message:: Message(std:: string message): message(message)
 {
 }
 
@@ -16,11 +16,6 @@ Message:: ~Message()
 std:: string Message:: get_message(void)
 {
     return (this-> message);
-}
-
-bool Message:: get_found(void)
-{
-    return (this->found);
 }
 
 std:: string Message:: get_command(void)
@@ -38,9 +33,9 @@ size_t Message:: get_size_vector(void)
     return (this->params.size());
 }
 
-void Message:: parse_message(std:: string password, std:: string message)
+int Message:: parse_message(std:: string password, std:: string message)
 {
-    this->found = true;
+    int check = 0;
     this->message = message;
     if (this->message[0] == ':')
     {
@@ -48,7 +43,7 @@ void Message:: parse_message(std:: string password, std:: string message)
         if (prefix_end == std::string::npos)
         {
             std:: cout << "Error: no space after prefix" << std:: endl;
-            return ;
+            return check;
         }
         this->prefix = this->message.substr(1, prefix_end - 1);
         this->message = this->message.substr(prefix_end + 1);
@@ -57,7 +52,7 @@ void Message:: parse_message(std:: string password, std:: string message)
     if (command_end == std::string::npos)
     {
         std:: cout << "Error: no space after command" << std:: endl;
-        return ;
+        return check;
     }
     this->command = this->message.substr(0, command_end);
     this->message = this->message.substr(command_end + 1);
@@ -66,13 +61,10 @@ void Message:: parse_message(std:: string password, std:: string message)
         if (this->command != "PASS")
         {
             std:: cout << "Invalid Command" << std:: endl;
-            return ;
+            return check;
         }
         if (this->message.find(password))
-        {
-            this->found = false;
-            return ;
-        }
+            return check = 461;
     }
     while (!this->message.empty())
     {
@@ -96,13 +88,39 @@ void Message:: parse_message(std:: string password, std:: string message)
             }
         }
     }
-    check_command(this->command);
+    check = check_command(this->params);
+    return (check);
 }
 
-void Message:: check_command(std:: string command)
+int Message:: check_command(std:: vector<std:: string> params)
 {
-    if (command == "NICK")
-        client.set_nick(this->message);
-    if (command == "USER")
-        client.set_nick(this->message);
+   std:: vector<std:: string>:: iterator it;
+   int index;
+   int check;
+
+   check = 0;
+   for (it = params.begin(); it != params.end(); it++)
+   {
+        // if (it->find("PASS") != std:: string:: npos)
+        // {
+        //     index = std:: distance(params.begin(), it);
+        
+        //     if (index != 1)
+        //     {
+        //         std:: cout << "Invalid command" << std:: endl;
+        //         return (0);
+        //     }
+        // }    
+         if (it->find("NICK") != std:: string:: npos)
+        {
+            index = std:: distance(params.begin(), it);
+            client.parse_nickname(params[index]);
+        }
+        else if (it->find("USER") != std:: string:: npos)
+        {
+            index = std:: distance(params.begin(), it);
+            check = client.parse_username(params[index]);
+        }
+   }
+   return (check);
 }

@@ -12,20 +12,18 @@ private:
     std:: string prefix;
     std:: string command;
     std:: vector<std:: string> params;
-    bool found;
     Client client;
 public:
     Message();
-    Message(std:: string message, bool found);
+    Message(std:: string message);
     ~Message();
 
     std:: string get_message(void);
     std:: string get_command(void);
-    bool get_found(void);
     void set_message(std:: string message);
     size_t get_size_vector(void);
-    void parse_message(std:: string password, std:: string message);
-    void check_command(std:: string command);
+    int parse_message(std:: string password, std:: string message);
+    int check_command(std:: vector<std:: string> params);
 };
 
 #endif

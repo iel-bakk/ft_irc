@@ -129,10 +129,12 @@ void Server:: accept_socket(void)
 void Server:: read_write_socket(int sockfd, int *num_fds)
 {
     int n;
+    int check;
     char buffer[256];
 
     memset(buffer, 0, sizeof(buffer));
     n = read(sockfd, buffer, 255);
+    check = 0;
     if (n < 0)
     {
         std:: cout << "Error: Reading From Socket" << std:: endl;
@@ -143,9 +145,8 @@ void Server:: read_write_socket(int sockfd, int *num_fds)
         (*num_fds)--;
         return ;
     }
-    my_message.parse_message(this->password, buffer);
-    if (!my_message.get_found())
-        n = HandleError(464, sockfd);
+    check = my_message.parse_message(this->password, buffer);
+    n = HandleError(check, sockfd);
     if (n < 0)
     {
         std:: cout << "Error: Writing From Socket" << std:: endl;
@@ -170,7 +171,9 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 464:
             num = write(sockfd, "464 ERR_PASSWDMISMATCH:Password incorrect\r\n", 43);
             break;
-
+        case 461:
+            num = write(sockfd, "461 ERR_NEEDMOREPARAMS USER :Not enough parameters\r\n", 52);
+            break;
         default:
             break;
     }
@@ -179,5 +182,6 @@ int Server:: HandleError(int error_replies, int sockfd)
 
 void Server:: close_socket(void)
 {
+    std:: cout << "Client is DISCONNECTED.\t\n" << std:: endl;
     close(this->sockfd);
 }
