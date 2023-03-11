@@ -40,6 +40,6 @@ class Server
         void listen_socket();
         void read_write_socket(int sockfd, int *num_fds);
         void send_socket(void);
-        void close_socket(void);
+        void close_socket(int socket);
         int HandleError(int error_replies, int sockfd);
 };

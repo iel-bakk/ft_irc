@@ -174,14 +174,16 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 461:
             num = write(sockfd, "461 ERR_NEEDMOREPARAMS USER :Not enough parameters\r\n", 52);
             break;
+        case 11:
+            close_socket (this->new_socket_fd);
         default:
             break;
     }
     return (num);
 }
 
-void Server:: close_socket(void)
+void Server:: close_socket(int socket)
 {
     std:: cout << "Client is DISCONNECTED.\t\n" << std:: endl;
-    close(this->sockfd);
+    close(socket);
 }

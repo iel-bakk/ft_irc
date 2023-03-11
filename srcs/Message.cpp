@@ -42,20 +42,27 @@ int Message:: parse_message(std:: string password, std:: string message)
         size_t prefix_end = this->message.find(' ');
         if (prefix_end == std::string::npos)
         {
-            std:: cout << "Error: no space after prefix" << std:: endl;
+            std:: cout << "Invalid Command" << std:: endl;
             return check;
         }
         this->prefix = this->message.substr(1, prefix_end - 1);
         this->message = this->message.substr(prefix_end + 1);
     }
+    if (this->message == "QUIT")
+        return check = 11;
     size_t command_end = this->message.find(' ');
     if (command_end == std::string::npos)
     {
-        std:: cout << "Error: no space after command" << std:: endl;
+        std:: cout << "Invalid Command" << std:: endl;
         return check;
     }
     this->command = this->message.substr(0, command_end);
     this->message = this->message.substr(command_end + 1);
+    if (check_upper(this->command))
+    {
+        std:: cout << "Invalid Command" << std:: endl;
+        return (0);
+    }
     if (this->params.size() == 0)
     {
         if (this->command != "PASS")
@@ -64,6 +71,11 @@ int Message:: parse_message(std:: string password, std:: string message)
             return check;
         }
         if (this->message.find(password))
+            return check = 461;
+    }
+    else
+    {
+        if (this->command == "PASS" && this->message.find(password))
             return check = 461;
     }
     while (!this->message.empty())
@@ -88,11 +100,11 @@ int Message:: parse_message(std:: string password, std:: string message)
             }
         }
     }
-    check = check_command(this->params);
+    check = check_command(this->params, password);
     return (check);
 }
 
-int Message:: check_command(std:: vector<std:: string> params)
+int Message:: check_command(std:: vector<std:: string> params, std:: string password)
 {
    std:: vector<std:: string>:: iterator it;
    int index;
@@ -103,15 +115,11 @@ int Message:: check_command(std:: vector<std:: string> params)
    {
         // if (it->find("PASS") != std:: string:: npos)
         // {
-        //     index = std:: distance(params.begin(), it);
-        
-        //     if (index != 1)
-        //     {
-        //         std:: cout << "Invalid command" << std:: endl;
-        //         return (0);
-        //     }
-        // }    
-         if (it->find("NICK") != std:: string:: npos)
+        //     std:: cout << "ana" << std:: endl;
+        //     if (this->message.find(password))
+        //         return check = 461;
+        // }
+        if (it->find("NICK") != std:: string:: npos)
         {
             index = std:: distance(params.begin(), it);
             client.parse_nickname(params[index]);
@@ -121,6 +129,18 @@ int Message:: check_command(std:: vector<std:: string> params)
             index = std:: distance(params.begin(), it);
             check = client.parse_username(params[index]);
         }
+        // else if (it->find("QUIT") != std:: string:: npos)
+        //     return check = 11;
    }
    return (check);
+}
+
+int Message:: check_upper(std:: string command)
+{
+    for (size_t i = 0; i < command.size(); i++)
+    {
+        if (!std::isupper(command[i]))
+            return (1);
+    }
+    return (0);
 }

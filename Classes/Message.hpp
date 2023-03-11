@@ -23,7 +23,8 @@ public:
     void set_message(std:: string message);
     size_t get_size_vector(void);
     int parse_message(std:: string password, std:: string message);
-    int check_command(std:: vector<std:: string> params);
+    int check_command(std:: vector<std:: string> params, std:: string password);
+    int check_upper(std:: string command);
 };
 
 #endif

@@ -33,7 +33,7 @@ void Client:: parse_nickname(std:: string vector)
    int find_space;
 
    find_space = vector.find(' ');
-   set_nick(vector.substr(find_space + 1));
+   this->user_name = vector.substr(find_space + 1);
 }
 
 int Client:: parse_username(std:: string vector)

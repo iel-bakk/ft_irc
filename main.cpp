@@ -1,5 +1,6 @@
 #include "Classes/Server.hpp"
 #include "Classes/Message.hpp"
+#include "Classes/Client.hpp"
 #include <netdb.h>
 
 int main(int ac, char **av)
@@ -31,10 +32,10 @@ int main(int ac, char **av)
         return (-1);
     }
     Server server(atoi(av[1]), password);
+    Client client;
     server.create_socket();
     server.bind_socket();
     server.listen_socket();
     server.accept_socket();
-    server.close_socket();
     return (0);
 }
