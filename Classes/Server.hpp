@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/poll.h>
+#include <stdlib.h>
 #include "../Classes/Message.hpp"
 
 # define max_num_fds 10

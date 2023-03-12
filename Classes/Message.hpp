@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "../Classes/Client.hpp"
+#include "../Classes/Channel.hpp"
 
 class Message
 {
@@ -13,6 +14,7 @@ private:
     std:: string command;
     std:: vector<std:: string> params;
     Client client;
+    Channel channel;
 public:
     Message();
     Message(std:: string message);
@@ -23,7 +25,7 @@ public:
     void set_message(std:: string message);
     size_t get_size_vector(void);
     int parse_message(std:: string password, std:: string message);
-    int check_command(std:: vector<std:: string> params, std:: string password);
+    int check_command(std:: vector<std:: string> params);
     int check_upper(std:: string command);
 };
 

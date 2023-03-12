@@ -42,22 +42,22 @@ int Message:: parse_message(std:: string password, std:: string message)
         size_t prefix_end = this->message.find(' ');
         if (prefix_end == std::string::npos)
         {
-            std:: cout << "Invalid Command" << std:: endl;
+            std:: cout << "Invalid Command1" << std:: endl;
             return check;
         }
         this->prefix = this->message.substr(1, prefix_end - 1);
         this->message = this->message.substr(prefix_end + 1);
     }
-    if (this->message == "QUIT")
-        return check = 11;
     size_t command_end = this->message.find(' ');
+    this->command = this->message.substr(0, command_end);
+    this->message = this->message.substr(command_end + 1);
+    if (this->message.substr(0, 4) == "QUIT")
+        return 11;
     if (command_end == std::string::npos)
     {
         std:: cout << "Invalid Command" << std:: endl;
         return check;
     }
-    this->command = this->message.substr(0, command_end);
-    this->message = this->message.substr(command_end + 1);
     if (check_upper(this->command))
     {
         std:: cout << "Invalid Command" << std:: endl;
@@ -100,11 +100,11 @@ int Message:: parse_message(std:: string password, std:: string message)
             }
         }
     }
-    check = check_command(this->params, password);
+    check = check_command(this->params);
     return (check);
 }
 
-int Message:: check_command(std:: vector<std:: string> params, std:: string password)
+int Message:: check_command(std:: vector<std:: string> params)
 {
    std:: vector<std:: string>:: iterator it;
    int index;
@@ -115,7 +115,6 @@ int Message:: check_command(std:: vector<std:: string> params, std:: string pass
    {
         // if (it->find("PASS") != std:: string:: npos)
         // {
-        //     std:: cout << "ana" << std:: endl;
         //     if (this->message.find(password))
         //         return check = 461;
         // }
@@ -129,8 +128,13 @@ int Message:: check_command(std:: vector<std:: string> params, std:: string pass
             index = std:: distance(params.begin(), it);
             check = client.parse_username(params[index]);
         }
-        // else if (it->find("QUIT") != std:: string:: npos)
-        //     return check = 11;
+        else if (it->find("JOIN") != std:: string:: npos)
+        {
+            index = std:: distance(params.begin(), it);
+            check = channel.parse_channel(params[index]);
+        }
+        else if (it->find("QUIT") != std:: string:: npos)
+            return check = 11;
    }
    return (check);
 }

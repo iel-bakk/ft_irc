@@ -2,7 +2,7 @@ CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = Server
 
-SRC = srcs/Client.cpp srcs/Message.cpp srcs/Server.cpp main.cpp
+SRC = srcs/Client.cpp srcs/Channel.cpp srcs/Message.cpp srcs/Server.cpp main.cpp
 	
 
 OBJ = $(SRC:.cpp=.o)
