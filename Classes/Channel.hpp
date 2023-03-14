@@ -7,6 +7,7 @@ class Channel
 {
 private:
     std:: string name;
+    std:: string password;
 public:
     Channel();
     ~Channel();

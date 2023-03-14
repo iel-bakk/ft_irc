@@ -16,14 +16,16 @@ int Channel:: parse_channel(std:: string channel)
     tab = channel.substr(channel.find(' ') + 1);
     if (tab.find(' ') != std:: string:: npos)
     {
-        this->name = tab.substr(tab.find(' ') + 1);
+        if (tab.find('&'))
+            return 461;
+        this->name = tab.substr(0, tab.find(' '));
+        this->password = tab.substr(tab.find(' ') + 1);
         return (0);
     }
-    else if (tab.find('#') == std:: string:: npos)
+    else if (!tab.find('#'))
     {
-        std:: cout << "NO channel" << std:: endl;
+        this->name = tab;
         return (0);
     }
-    this->name = tab;
-    return (0);
+    return (461);
 }

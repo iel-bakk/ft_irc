@@ -146,6 +146,7 @@ void Server:: read_write_socket(int sockfd, int *num_fds)
         return ;
     }
     check = my_message.parse_message(this->password, buffer);
+    // this->password = my_message.get_password();
     n = HandleError(check, sockfd);
     if (n < 0)
     {
@@ -173,6 +174,9 @@ int Server:: HandleError(int error_replies, int sockfd)
             break;
         case 461:
             num = write(sockfd, "461 ERR_NEEDMOREPARAMS USER :Not enough parameters\r\n", 52);
+            break;
+        case 462:
+            num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
             break;
         case 11:
             close_socket(this->new_socket_fd);

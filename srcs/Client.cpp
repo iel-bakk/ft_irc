@@ -38,7 +38,6 @@ void Client:: parse_nickname(std:: string vector)
 
 int Client:: parse_username(std:: string vector)
 {
-//    int find_space;
    int count = 0;
    int check = 0;
    int sentenceCount = 0;
@@ -64,6 +63,16 @@ int Client:: parse_username(std:: string vector)
         std:: string sentence = vector.substr(lastsentence + 1);
         sentences[sentenceCount] = sentence;
         sentenceCount++;
+    }
+    if (this->user_name == sentences[1])
+        return (check = 462);
+    for (size_t i = 0; i != sentences[2].size() - 1; i++)
+    {
+        if (!isdigit(sentences[2][i]))
+        {
+            std:: cout << "Not Numeric" << std:: endl;
+            return (0); // ??????????
+        }
     }
     this->user_name = sentences[1];
     this->mode = sentences[2];

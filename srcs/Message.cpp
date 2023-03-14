@@ -33,6 +33,11 @@ size_t Message:: get_size_vector(void)
     return (this->params.size());
 }
 
+std:: string Message:: get_password(void)
+{
+    return (this->password);
+}
+
 int Message:: parse_message(std:: string password, std:: string message)
 {
     int check = 0;
@@ -66,17 +71,16 @@ int Message:: parse_message(std:: string password, std:: string message)
     if (this->params.size() == 0)
     {
         if (this->command != "PASS")
-        {
-            std:: cout << "Invalid Command" << std:: endl;
-            return check;
-        }
+            return check = 464;
         if (this->message.find(password))
-            return check = 461;
+            return check = 464;
     }
     else
     {
         if (this->command == "PASS" && this->message.find(password))
-            return check = 461;
+            return check = 464;
+        else
+            this->password = password;
     }
     while (!this->message.empty())
     {
@@ -100,24 +104,37 @@ int Message:: parse_message(std:: string password, std:: string message)
             }
         }
     }
-    check = check_command(this->params);
+//    std:: vector<std:: string>:: iterator it;
+//    std:: cout << "-----------------------" << std:: endl;
+//    for (it = params.begin(); it != params.end(); it++)
+//         std:: cout << *it << " ";
+//    std:: cout << "-----------------------" << std:: endl;
+//     if (this->params[0].find("PASS"))
+//     {
+    
+//         std:: cout << "Im here" << std:: endl;
+//         this->params.erase(this->params.begin());
+//         return check = 464;
+//     }
+//     else if (this->message.find(password))
+//     {
+//         this->params.erase(this->params.begin());
+//         return check = 464;
+//     }
+    check = check_command(this->params, password);
     return (check);
 }
 
-int Message:: check_command(std:: vector<std:: string> params)
+int Message:: check_command(std:: vector<std:: string> params, std:: string password)
 {
    std:: vector<std:: string>:: iterator it;
    int index;
    int check;
 
    check = 0;
+   std:: cout << password << std:: endl;
    for (it = params.begin(); it != params.end(); it++)
    {
-        // if (it->find("PASS") != std:: string:: npos)
-        // {
-        //     if (this->message.find(password))
-        //         return check = 461;
-        // }
         if (it->find("NICK") != std:: string:: npos)
         {
             index = std:: distance(params.begin(), it);
