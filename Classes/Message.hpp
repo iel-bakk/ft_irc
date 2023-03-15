@@ -27,8 +27,9 @@ public:
     std:: string get_password(void);
     void set_message(std:: string message);
     int parse_message(std:: string password, std:: string message);
-    int check_command(std:: vector<std:: string> params, std:: string password);
+    int check_command(std:: vector<std:: string> params);
     int check_upper(std:: string command);
+    int check_Password(int size, std:: string command, std:: string message, std:: string password);
 };
 
 #endif

@@ -56,7 +56,7 @@ int Message:: parse_message(std:: string password, std:: string message)
     size_t command_end = this->message.find(' ');
     this->command = this->message.substr(0, command_end);
     this->message = this->message.substr(command_end + 1);
-    if (this->message.substr(0, 4) == "QUIT")
+     if (this->message.substr(0, 4) == "QUIT")
         return 11;
     if (command_end == std::string::npos)
     {
@@ -68,20 +68,9 @@ int Message:: parse_message(std:: string password, std:: string message)
         std:: cout << "Invalid Command" << std:: endl;
         return (0);
     }
-    if (this->params.size() == 0)
-    {
-        if (this->command != "PASS")
-            return check = 464;
-        if (this->message.find(password))
-            return check = 464;
-    }
-    else
-    {
-        if (this->command == "PASS" && this->message.find(password))
-            return check = 464;
-        else
-            this->password = password;
-    }
+    check = check_Password(this->params.size(), this->command, this->message, password);
+    if (check != 0)
+        return check;
     while (!this->message.empty())
     {
         if (message[0] == ':')
@@ -104,35 +93,22 @@ int Message:: parse_message(std:: string password, std:: string message)
             }
         }
     }
-//    std:: vector<std:: string>:: iterator it;
-//    std:: cout << "-----------------------" << std:: endl;
-//    for (it = params.begin(); it != params.end(); it++)
-//         std:: cout << *it << " ";
-//    std:: cout << "-----------------------" << std:: endl;
-//     if (this->params[0].find("PASS"))
-//     {
-    
-//         std:: cout << "Im here" << std:: endl;
-//         this->params.erase(this->params.begin());
-//         return check = 464;
-//     }
-//     else if (this->message.find(password))
-//     {
-//         this->params.erase(this->params.begin());
-//         return check = 464;
-//     }
-    check = check_command(this->params, password);
+    std:: cout << "---------------------" << std:: endl;
+    std:: vector<std:: string>:: iterator it;
+    for (it = this->params.begin(); it != this->params.end() ; it++)
+        std:: cout << *it ;
+    std:: cout << "---------------------" << std:: endl;
+    check = check_command(this->params);
     return (check);
 }
 
-int Message:: check_command(std:: vector<std:: string> params, std:: string password)
+int Message:: check_command(std:: vector<std:: string> params)
 {
    std:: vector<std:: string>:: iterator it;
    int index;
    int check;
 
    check = 0;
-   std:: cout << password << std:: endl;
    for (it = params.begin(); it != params.end(); it++)
    {
         if (it->find("NICK") != std:: string:: npos)
@@ -154,6 +130,28 @@ int Message:: check_command(std:: vector<std:: string> params, std:: string pass
             return check = 11;
    }
    return (check);
+}
+
+int Message:: check_Password(int size, std:: string command, std:: string message, std:: string password)
+{
+    int check;
+
+    check = 0;
+    if (size == 0)
+    {
+        if (command != "PASS")
+            return check = 464;
+        if (message.find(password))
+            return check = 464;
+    }
+    else
+    {
+        if (command == "PASS" && message.find(password))
+            return check = 464;
+        else
+            password = password;
+    }
+    return (check);
 }
 
 int Message:: check_upper(std:: string command)

@@ -66,7 +66,7 @@ int Client:: parse_username(std:: string vector)
     }
     if (this->user_name == sentences[1])
         return (check = 462);
-    for (size_t i = 0; i != sentences[2].size() - 1; i++)
+    for (size_t i = 0; i != sentences[2].size() - 2; i++)
     {
         if (!isdigit(sentences[2][i]))
         {
