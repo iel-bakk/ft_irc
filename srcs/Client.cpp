@@ -28,12 +28,32 @@ void Client:: set_user(std:: string message)
    this->user_name = message;
 }
 
-void Client:: parse_nickname(std:: string vector)
+int Client:: parse_nickname(std:: string vector)
 {
    int find_space;
+   int find_newline;
+   int check;
+   std:: string message;
 
+   
+   check = 0;
    find_space = vector.find(' ');
-   this->user_name = vector.substr(find_space + 1);
+   message = vector.substr(find_space + 1);
+   if (message.find('\n') != std:: string:: npos)
+   {
+        find_newline = message.find('\n');
+        message = message.substr(0, find_newline - 1);
+   }
+   if (message.find(' ') != std:: string:: npos)
+   {
+        find_space = message.find(' ');
+        message = message.substr(0, find_space);
+   }
+    if (this->nick_name == message)
+        return check = 432;
+    else
+       this->nick_name = message;
+   return check;
 }
 
 int Client:: parse_username(std:: string vector)
@@ -42,14 +62,15 @@ int Client:: parse_username(std:: string vector)
    int check = 0;
    int sentenceCount = 0;
    std:: string sentences[5];
+   std:: string sentence;
    size_t lastsentence = -1;
    check = 0;
 
    for (size_t i = 0; i != vector.size(); i++)
    {
-        if (vector[i] == ' ')
+        if (vector[i] ==' ')
         {
-            std:: string sentence = vector.substr(lastsentence + 1, i - lastsentence);
+            sentence = vector.substr(lastsentence + 1, i - lastsentence);
             sentences[sentenceCount] = sentence;
             sentenceCount++;
             count++;
@@ -60,7 +81,7 @@ int Client:: parse_username(std:: string vector)
        return (check = 461);
     if (lastsentence < vector.size() - 1)
     {
-        std:: string sentence = vector.substr(lastsentence + 1);
+        sentence = vector.substr(lastsentence + 1);
         sentences[sentenceCount] = sentence;
         sentenceCount++;
     }
@@ -69,10 +90,7 @@ int Client:: parse_username(std:: string vector)
     for (size_t i = 0; i != sentences[2].size() - 2; i++)
     {
         if (!isdigit(sentences[2][i]))
-        {
-            std:: cout << "Not Numeric" << std:: endl;
-            return (0); // ??????????
-        }
+            return (10); // ??????????
     }
     this->user_name = sentences[1];
     this->mode = sentences[2];
@@ -80,4 +98,3 @@ int Client:: parse_username(std:: string vector)
     this->realname = sentences[4];
    return (check);
 }
-

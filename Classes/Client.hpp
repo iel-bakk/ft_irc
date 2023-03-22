@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <unistd.h>
+#include <time.h>
 
 class Client
 {
@@ -20,7 +22,7 @@ public:
     std:: string get_user_name();
     void set_nick(std:: string message);
     void set_user(std:: string message);
-    void parse_nickname(std:: string vector);
+    int parse_nickname(std:: string vector);
     int parse_username(std:: string vector);
 };
 

@@ -2,6 +2,7 @@
 
 Server:: Server()
 {
+    Message();
 }
 Server:: ~Server()
 {
@@ -78,13 +79,16 @@ void Server:: accept_socket(void)
 {
     size_t size;
     int num_fds;
+    int count;
     int sock;
+    std:: vector<std:: string> new_user;
 
     size = sizeof(this->socker_addr);
     memset(this->fds, 0, max_num_fds * sizeof(struct pollfd));
     this->fds[0].fd = this->sockfd;
     this->fds[0].events = POLLIN;
     num_fds = 1;
+    count = 0;
     while (true)
     {
         int ret = poll(this->fds, num_fds, -1);
@@ -114,19 +118,23 @@ void Server:: accept_socket(void)
                         this->fds[num_fds].fd = this->new_socket_fd;
                         this->fds[num_fds].events = POLLIN;
                         num_fds++;
+                        Message my_message(this->new_socket_fd);
+                        this->file_vectors[count] = my_message;
+                        count++;
                     }
                 }
                 else
                 {
                     sock = this->fds[i].fd;
-                    read_write_socket(sock, &num_fds);
+                    my_place = i - 1;
+                    read_write_socket(sock, &num_fds, &this->file_vectors[my_place]);
                 }
             }
         }
     }
 }
 
-void Server:: read_write_socket(int sockfd, int *num_fds)
+void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
 {
     int n;
     int check;
@@ -143,10 +151,10 @@ void Server:: read_write_socket(int sockfd, int *num_fds)
     if (n == 0 || !strcmp(buffer, "QUIT Leaving...\r\n"))
     {
         (*num_fds)--;
+        n = HandleError(check = 11, sockfd);
         return ;
     }
-    check = my_message.parse_message(this->password, buffer);
-    // this->password = my_message.get_password();
+    check = new_user->parse_message(this->password, buffer);
     n = HandleError(check, sockfd);
     if (n < 0)
     {
@@ -166,20 +174,46 @@ void Server:: send_socket(void)
 int Server:: HandleError(int error_replies, int sockfd)
 {
     int num = 0;
+    std:: string handle_message;
 
     switch (error_replies)
     {
+        case 10:
+            std:: cout << "Not Numeric" << std:: endl; // ???????
+            break;
+        case 11:
+            close_socket(this->file_vectors[my_place].get_socket());
+            break;
+        case 12:
+            std:: cout << "Invalid Command" << std:: endl; // ???????
+            break;
+        case 13:
+            num = write_long_message(sockfd);
+            break;
+        case 14:
+            num = send_private_message();
+            break;
+        case 412:
+            num = write(sockfd, "412 ERR_NOTEXTTOSEND :No text to send\r\n", 39);
+            break;
+        case 431:
+            num = write(sockfd, "431 ERR_NONICKNAMEGIVEN:No nickname given\r\n", 43);
+            break;
+        case 432:
+            num = write(sockfd, "432 ERR_ERRONEUSNICKNAME:Erroneous nickname\r\n", 45); //????
+            break;
+        case 451:
+            num = write(sockfd, "451 ERR_NOTREGISTERED:You have not registered\r\n", 47);
+            break;
         case 464:
             num = write(sockfd, "464 ERR_PASSWDMISMATCH:Password incorrect\r\n", 43);
             break;
         case 461:
-            num = write(sockfd, "461 ERR_NEEDMOREPARAMS USER :Not enough parameters\r\n", 52);
+            num = display_error();
             break;
         case 462:
             num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
             break;
-        case 11:
-            close_socket(this->new_socket_fd);
         default:
             break;
     }
@@ -188,6 +222,75 @@ int Server:: HandleError(int error_replies, int sockfd)
 
 void Server:: close_socket(int socket)
 {
-    std:: cout << "Client is DISCONNECTED." << std:: endl;
+    std:: cout << "Client is DISCONNECTED" << std:: endl;
     close(socket);
+    this->file_vectors.erase(my_place);
+}
+
+int Server:: write_long_message(int sockfd)
+{
+    int num;
+
+    num = 0;
+    std:: string message;
+
+    message = this->file_vectors[my_place].get_welcome_message() + "\t\n";
+    if (message.size() != 0)
+        num = display_message(sockfd, message);
+    message = this->file_vectors[my_place].get_host_message() + "\t\n";
+    if (message.size() != 0)
+        num = display_message(sockfd, message);
+    message = this->file_vectors[my_place].get_server_message() + "\t\n";
+    if (message.size() != 0)
+        num = display_message(sockfd, message);
+    
+    return (num);
+}
+
+int Server:: send_private_message(void)
+{
+    int num = 0;
+    std:: string message;
+
+    for (size_t i = 0; i != this->file_vectors.size(); i++)
+    {
+        if (this->file_vectors[i].get_my_user() == this->file_vectors[my_place].get_user_to_send())
+        {
+            message = ":" + this->file_vectors[my_place].get_my_user() + this->file_vectors[my_place].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[my_place].get_message_to_send() + "\t\n";
+            num = display_message(this->file_vectors[i].get_socket(), message);
+            return (num);
+        }
+    }
+    message = "401 ERR_NOSUCHNICK " + this->file_vectors[my_place].get_user_to_send() + ":No such nick/channel" + "\t\n";
+    num = display_message(this->file_vectors[my_place].get_socket(), message);
+    return num;
+}
+
+int Server:: display_message(int sockfd, std:: string message)
+{
+    int num;
+
+    num = 0;
+    for (size_t i = 0; i < message.size(); i++)
+    {
+        num = write(sockfd, &message[i], 1);
+        if (num < 0)
+            return (-1);
+    }
+    return (num);
+}
+
+int Server:: display_error(void)
+{
+    std:: string handle_message;
+    std:: string message;
+    int num;
+
+    if (this->file_vectors[my_place].get_command().find('\n') != std:: string:: npos)
+        handle_message = this->file_vectors[my_place].get_command().substr(0, this->file_vectors[my_place].get_command().size() - 2);
+    else
+        handle_message = this->file_vectors[my_place].get_command();
+    message = "461 ERR_NEEDMOREPARAMS " + handle_message + " :Not enough parameters" + "\r\n";
+    num = display_message(this->file_vectors[my_place].get_socket(), message);
+    return (num);
 }
