@@ -124,10 +124,6 @@ int Message:: parse_message(std:: string password, std:: string message)
     check = check_my_vector(this->params);
     if (check != 0 && check != 13 && check != 14)
         this->params.erase(this->params.end() - 1);
-    std:: cout << "**********************************" << std:: endl;
-    for (size_t i = 0; i < this->params.size(); i++)
-        std:: cout << this->params[i] << std:: endl;
-    std:: cout << "**********************************" << std:: endl;
     return (check);
 }
 
