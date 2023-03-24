@@ -47,9 +47,9 @@ public:
     int parse_message(std:: string password, std:: string message);
     int check_upper(std:: string command);
     int check_my_vector(std:: vector<std:: string> params);
-    int check_Error_Space(std:: string command, std:: string request);
+    int check_Error_Space(std:: string command);
     int send_Message_identification(int check);
-    int check_Password(int size, std:: string command, std:: string message, std:: string password, std:: string request);
+    int check_Password_Space(int size, std:: string command, std:: string message, std:: string password);
     int parse_private_message(std:: string message);
     std:: vector<std:: string> create_vector(void);
     bool check_command(std:: string command);

@@ -68,7 +68,7 @@ int Client:: parse_username(std:: string vector)
 
    for (size_t i = 0; i != vector.size(); i++)
    {
-        if (vector[i] ==' ')
+        if (vector[i] == ' ')
         {
             sentence = vector.substr(lastsentence + 1, i - lastsentence);
             sentences[sentenceCount] = sentence;

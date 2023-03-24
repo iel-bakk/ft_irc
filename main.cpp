@@ -32,7 +32,6 @@ int main(int ac, char **av)
         return (-1);
     }
     Server server(atoi(av[1]), password);
-    Client client;
     server.create_socket();
     server.bind_socket();
     server.listen_socket();

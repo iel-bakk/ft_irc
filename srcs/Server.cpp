@@ -47,9 +47,7 @@ void Server:: create_socket(void)
     int reuseport = 1;
     this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->sockfd == -1)
-    {
         std:: cout << "Error: socket not created" << std:: endl;
-    }
     setsockopt(this->sockfd, SOL_SOCKET, SO_REUSEPORT, &reuseport, sizeof(reuseport));
 }
 

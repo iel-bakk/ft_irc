@@ -96,13 +96,16 @@ int Message:: parse_message(std:: string password, std:: string message)
     size_t command_end = this->message.find(' ');
     this->command = this->message.substr(0, command_end);
     this->message = this->message.substr(command_end + 1);
-    if (this->message.find(' ') != std:: string:: npos )
-        this->message = handle_space(this->message, this->command);
     if (this->message.substr(0, 4) == "QUIT")
         return 11;
-    // if (command_end == std::string::npos)
-    //     return check = 12;
-    check = check_Password(this->params.size(), this->command, this->message, password, message);
+    if (command_end == std:: string:: npos)
+    {
+        check = check_Error_Space(this->command);
+        return (check);
+    }
+    if (this->message.find(' ') != std:: string:: npos )
+        this->message = handle_space(this->message, this->command);
+    check = check_Password_Space(this->params.size(), this->command, this->message, password);
     if (check_upper(this->command))
         return check = 12;
     if (check != 0)
@@ -184,34 +187,40 @@ int Message:: check_my_vector(std:: vector<std:: string> params)
    return (check);
 }
 
-int Message:: check_Password(int size, std:: string command, std:: string message, std:: string password, std:: string request)
+int Message:: check_Password_Space(int size, std:: string command, std:: string message, std:: string password)
 {
     int check;
-    int found_newline;
+    size_t found_new_line;
     std:: string my_password;
 
     check = 0;
-    check = check_Error_Space(this->command, request);
-    if (check != 0)
-        return check;
-    if (message.find('\n') != std:: string:: npos)
+    found_new_line = message.find('\n');
+    if (found_new_line != std:: string:: npos)
     {
-        found_newline = message.find('\n');
-        my_password = message.substr(0, found_newline - 1);
+        my_password = message.substr(0, found_new_line - 1);
+        if (my_password.empty())
+        {
+            check = check_Error_Space(command);
+            return (check);
+        }
     }
+    else
+        my_password = message;
     if (size == 0)
     {
         if (command != "PASS")
             return check = 464;
         if (my_password != password)
             return check = 464;
+        else
+            this->password = my_password;
     }
     else
     {
         if (command == "PASS" && my_password != password)
             return check = 464;
         else
-            this->password = password;
+            this->password = my_password;
     }
     return (check);
 }
@@ -226,30 +235,16 @@ int Message:: check_upper(std:: string command)
     return (0);
 }
 
-int Message:: check_Error_Space(std:: string command, std:: string request)
+int Message:: check_Error_Space(std:: string command)
 {
     int check;
-    int count;
-
-    count = 0;
+   
     check = 0;
-    for (size_t i = 0; i != request.size(); i++)
-    {
-        if (request[i] == ' ')
-            ++count;
-    }
-    if (command == "PASS" && count > 1)
-        return check = 464;
-    if(request[request.size() - 3] == ' ')
-        --count;
-    if (count == 0)
-    {
-        if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos)
-            return check = 461;
-        else if (command.find("NICK") != std:: string:: npos)
-            return check = 431;
-    }
-    return check;
+    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos)
+        return check = 461;
+    else if (command.find("NICK") != std:: string:: npos)
+        return check = 431;
+    return (check);
 }
 
 int Message:: send_Message_identification(int check)
@@ -276,50 +271,33 @@ int Message:: send_Message_identification(int check)
 std:: string Message:: handle_space(std:: string message, std:: string command)
 {
     std:: string str;
-    int count = 0;
     size_t size;
+    int count;
 
     size = message.size();
-    if (command == "PASS" && command == "NICK")
+    count = 0;
+    bool previous_was_space = true;
+    for (size_t i = 0; i != size - 2; i++)
     {
-        for (size_t i = 0; i != size; i++)
+        if(std::isspace(message[i]))
         {
-            if (message[i] != ' ')
-                str += message[i];
-        }
-        return (str);
-    }
-    else
-    {
-        for (size_t i = 0; i != size; i++)
-        {
-            if (message[i] == ' ')
-                count++;
-        }
-        if (count == 3)
-            return message;
-        else
-        {
-            bool previous_was_space = true;
-            for (size_t i = 0; i != size - 2; i++)
+            if (!previous_was_space)
             {
-                if(std::isspace(message[i]))
-                {
-                    if (!previous_was_space)
-                    {
-                        str += ' ';
-                        previous_was_space = true;
-                    }
-                }
-                else
-                {
-                    str += message[i];
-                    previous_was_space = false;
-                }
+                str += ' ';
+                previous_was_space = true;
+                ++count;
             }
         }
+        else
+        {
+            str += message[i];
+            if (command == "PASS")
+                previous_was_space = true;
+            else
+                previous_was_space = false;
+        }
     }
-    return str;
+    return str; 
 }
 
 int Message:: parse_private_message(std:: string message)
@@ -338,9 +316,7 @@ int Message:: parse_private_message(std:: string message)
         if (count == 1)
         {
             if (message[i] != ' ')
-            {
                 user += message[i];
-            }
         }
         else if (count >= 2)
         {
