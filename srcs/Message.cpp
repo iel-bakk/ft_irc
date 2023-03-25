@@ -159,7 +159,7 @@ int Message:: check_my_vector(std:: vector<std:: string> params)
             }
             else if (it->find("PRIVMSG") != std:: string:: npos)
             {
-                if (client.get_nick_name().size() != 0 && client.get_user_name().size())
+                if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0)
                 {
                     index = std:: distance(params.begin(), it);
                     check = parse_private_message(params[index]);

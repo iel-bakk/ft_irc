@@ -232,13 +232,13 @@ int Server:: write_long_message(int sockfd)
     num = 0;
     std:: string message;
 
-    message = this->file_vectors[my_place].get_welcome_message() + "\t\n";
+    message = this->file_vectors[my_place].get_welcome_message() + "\r\n";
     if (message.size() != 0)
         num = display_message(sockfd, message);
-    message = this->file_vectors[my_place].get_host_message() + "\t\n";
+    message = this->file_vectors[my_place].get_host_message() + "\r\n";
     if (message.size() != 0)
         num = display_message(sockfd, message);
-    message = this->file_vectors[my_place].get_server_message() + "\t\n";
+    message = this->file_vectors[my_place].get_server_message() + "\r\n";
     if (message.size() != 0)
         num = display_message(sockfd, message);
     
@@ -254,12 +254,12 @@ int Server:: send_private_message(void)
     {
         if (this->file_vectors[i].get_my_user() == this->file_vectors[my_place].get_user_to_send())
         {
-            message = ":" + this->file_vectors[my_place].get_my_user() + this->file_vectors[my_place].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[my_place].get_message_to_send() + "\t\n";
+            message = ":" + this->file_vectors[my_place].get_my_user() + this->file_vectors[my_place].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[my_place].get_message_to_send() + "\r\n";
             num = display_message(this->file_vectors[i].get_socket(), message);
             return (num);
         }
     }
-    message = "401 ERR_NOSUCHNICK " + this->file_vectors[my_place].get_user_to_send() + ":No such nick/channel" + "\t\n";
+    message = "401 ERR_NOSUCHNICK " + this->file_vectors[my_place].get_user_to_send() + ":No such nick/channel" + "\r\n";
     num = display_message(this->file_vectors[my_place].get_socket(), message);
     return num;
 }
